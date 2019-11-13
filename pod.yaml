@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+    - name: kaniko
+      image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/executor:latest
+      args:
+        - --dockerfile=/opt/hello/Dockerfile
+        - --context=/opt/hello
+        - --destination=fc277073030/hello:v1.6
+        - --cache=true
+        - --cache-dir=/tmp
+      volumeMounts:
+        - name: context-data
+          mountPath: /opt/hello
+        - name: docker-config
+          mountPath: /kaniko/.docker/
+        - name: kaniko-cache
+          mountPath: /cache
+  restartPolicy: Never
+  volumes:
+    - name: context-data
+      configMap:
+        name: dockerfile-cm
+    - name: docker-config
+      configMap:
+        name: docker-config
+    - name: kaniko-cache
+      persistentVolumeClaim:
+        claimName: kaniko-cache-claim
+

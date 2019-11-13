@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-warmer
+spec:
+  containers:
+    - name: kaniko-warmer
+      image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/warmer:latest
+      args: ["--cache-dir=/cache",
+             "--image=ubuntu"]
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker/
+        - name: kaniko-cache
+          mountPath: /cache
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
+    - name: kaniko-cache
+      persistentVolumeClaim:
+        claimName: kaniko-cache-claim

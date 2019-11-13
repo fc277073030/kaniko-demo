@@ -1,0 +1,12 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: kaniko-cache-volume
+  labels:
+    type: local
+spec:
+  storageClassName: alicloud-nas
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadOnlyMany
