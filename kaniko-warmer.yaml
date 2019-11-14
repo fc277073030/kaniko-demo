@@ -19,5 +19,7 @@ spec:
       secret:
         secretName: kaniko-secret
     - name: kaniko-cache
-      persistentVolumeClaim:
-        claimName: kaniko-cache-claim
+      hostPath:
+        path: /Users/fanchao/Downloads/kaniko-cache
+#      persistentVolumeClaim:
+#        claimName: kaniko-cache-claim

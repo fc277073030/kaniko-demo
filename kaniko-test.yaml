@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-test
+spec:
+  containers:
+    - name: git-sync
+      image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/git-sync:v3.1.1
+      env:
+        - name: GIT_SYNC_REPO
+          value: https://github.com/fc277073030/kaniko-demo.git
+        - name: GIT_SYNC_DEST
+          value: kaniko-demo
+      volumeMounts:
+        - mountPath: /tmp/git
+          name: share-dir
+    - name: nginx
+
+#    - name: kaniko-test
+#      image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/executor:latest
+#      args:
+#        - --dockerfile=/tmp/git/kaniko-demo/Dockerfile
+#        - --context=/tmp/git/kaniko-demo
+#        - --destination=fc277073030/hello:v3.2
+#        - --cache=true
+#        - --cache-dir=/cache
+
+#      volumeMounts:
+#        - mountPath: /kaniko/.docker/
+#          name: kaniko-secret
+#        - mountPath: /tmp/git
+#          name: share-dir
+#        - mountPath: /cache
+#          name: kaniko-cache
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
+    - name: share-dir
+      emptyDir: {}
+
+
+#    - name: kaniko-cache
+#      persistentVolumeClaim:
+#        claimName: kaniko-cache-claim
+
+
+
+

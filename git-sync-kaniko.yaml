@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kaniko-demo-git-source
+spec:
+#  ttlSecondsAfterFinished: 10
+  template:
+    spec:
+      containers:
+        - name: git-sync
+          image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/git-sync:v3.1.1
+          volumeMounts:
+            - name: source
+              mountPath: /tmp/git
+          env:
+            - name: GIT_SYNC_REPO
+              value: https://github.com/fc277073030/kaniko-demo.git
+            - name: GIT_SYNC_DEST
+              value: kaniko-demo
+      volumes:
+        - name: source
+          persistentVolumeClaim:
+            claimName: kaniko-cache-claim
+      restartPolicy: Never

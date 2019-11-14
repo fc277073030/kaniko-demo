@@ -1,4 +1,4 @@
 FROM ubuntu
 CMD pwd
 
-ENTRYPOINT ["/bin/bash", "-c", "echo $pwd"]
+ENTRYPOINT ["/bin/bash", "-c", "echo hello"]

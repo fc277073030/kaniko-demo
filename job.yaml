@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: git-clone
+spec:
+  template:
+    metadata:
+      name: git-clone
+    spec:
+      containers:
+        - name: git
+          image: fc277073030/git-sync-amd64:v2.0.4
+          command: ["git",  "clone", "-wle", "print bpi(2000)"]
+      restartPolicy: Never

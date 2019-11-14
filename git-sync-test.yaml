@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-sync
+spec:
+  selector:
+    matchLabels:
+      demo: git-sync
+  template:
+    metadata:
+      labels:
+        demo: git-sync
+    spec:
+      volumes:
+        - name: git-secret
+          secret:
+            defaultMode: 256
+            secretName: git-creds # your-ssh-key
+        - name: source
+          persistentVolumeClaim:
+            claimName: kaniko-cache-claim
+      containers:
+        - name: git-sync
+          image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/git-sync:v3.1.1
+          args:
+            - "-ssh"
+            - "-repo=https://github.com/fc277073030/kaniko-demo.git"
+            - "-dest=kaniko-demo"
+            - "-branch=master"
+            - "-depth=1"
+          securityContext:
+            runAsUser: 65533 # git-sync user
+          volumeMounts:
+            - name: git-secret
+              mountPath: /etc/git-secret
+            - name: source
+              mountPath: /tmp/git
+      securityContext:
+        fsGroup: 65533 # to make SSH key readable

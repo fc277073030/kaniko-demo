@@ -4,31 +4,56 @@ metadata:
   name: kaniko-test
 spec:
   containers:
+    - name: git-sync
+      image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/git-sync:v3.1.1
+      args:
+        - "-ssh"
+        - "-repo=https://github.com/fc277073030/kaniko-demo.git"
+        - "-dest=kaniko-demo"
+        - "-branch=master"
+        - "-depth=1"
+      securityContext:
+        runAsUser: 65533 # git-sync user
+      volumeMounts:
+        - name: git-secret
+          mountPath: /etc/git-secret
+        - name: source
+          mountPath: /tmp/git
+
     - name: kaniko-test
       image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/executor:latest
       args:
-        - --dockerfile=/opt/hello/Dockerfile
-        - --context=/opt/hello
+        - --dockerfile=/tmp/git/kaniko-demo/Dockerfile
+        - --context=/tmp/git/kaniko-demo
+        - --destination=fc277073030/hello:v3.1
         - --cache=true
-        - --destination=fc277073030/hello:v1.0
         - --cache-dir=/cache
       volumeMounts:
         - name: context-data
-          mountPath: /opt/hello
-        - name: docker-config
+          mountPath: /tmp/git/hello
+        - name: kaniko-secret
           mountPath: /kaniko/.docker/
         - name: kaniko-cache
           mountPath: /cache
   restartPolicy: Never
   volumes:
+    - name: git-secret
+      secret:
+        secretName: git-creds
+    - name: git-secret
+      secret:
+        defaultMode: 256
+        secretName: git-creds # your-ssh-key
+    - name: source
+      persistentVolumeClaim:
+        claimName: kaniko-cache-claim
     - name: context-data
-      configMap:
-        name: dockerfile-cm
-    - name: docker-config
+      persistentVolumeClaim:
+        claimName: kaniko-cache-claim
+    - name: kaniko-secret
       secret:
         secretName: kaniko-secret
-#      configMap:
-#        name: docker-config
     - name: kaniko-cache
       persistentVolumeClaim:
         claimName: kaniko-cache-claim
+

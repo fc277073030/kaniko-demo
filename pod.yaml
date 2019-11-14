@@ -7,27 +7,27 @@ spec:
     - name: kaniko
       image: registry.cn-hangzhou.aliyuncs.com/tekton-pipelines/executor:latest
       args:
-        - --dockerfile=/opt/hello/Dockerfile
-        - --context=/opt/hello
-        - --destination=fc277073030/hello:v1.6
-        - --cache=true
-        - --cache-dir=/tmp
+        - --dockerfile=/flask-demo/Dockerfile
+        - --context=/flask-demo
+        - --destination=fc277073030/flask-demo:v3.0
+#        - --cache=true
+#        - --cache-dir=/cache
       volumeMounts:
         - name: context-data
-          mountPath: /opt/hello
-        - name: docker-config
+          mountPath: /flask-demo
+        - name: kaniko-secret
           mountPath: /kaniko/.docker/
-        - name: kaniko-cache
-          mountPath: /cache
+#        - name: kaniko-cache
+#          mountPath: /cache
   restartPolicy: Never
   volumes:
     - name: context-data
-      configMap:
-        name: dockerfile-cm
-    - name: docker-config
-      configMap:
-        name: docker-config
-    - name: kaniko-cache
       persistentVolumeClaim:
         claimName: kaniko-cache-claim
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
+#    - name: kaniko-cache
+#      persistentVolumeClaim:
+#        claimName: kaniko-cache-claim
 
